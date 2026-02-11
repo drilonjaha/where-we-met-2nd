@@ -1,30 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { Heart, ArrowLeft, CreditCard, Shield, Download } from "lucide-react";
 import Link from "next/link";
 import { useStore } from "@/lib/store";
 
 export default function CheckoutPage() {
-  const [loading, setLoading] = useState(false);
   const name1 = useStore((s) => s.name1);
   const name2 = useStore((s) => s.name2);
   const locationLabel = useStore((s) => s.locationLabel);
 
-  const handleCheckout = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/create-checkout-session", {
-        method: "POST",
-      });
-      const { url } = await res.json();
-      if (url) {
-        window.location.href = url;
-      }
-    } catch {
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+  const handleCheckout = () => {
+    const paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK;
+    if (paymentLink) {
+      window.location.href = paymentLink;
     }
   };
 
@@ -83,17 +71,10 @@ export default function CheckoutPage() {
             {/* Pay button */}
             <button
               onClick={handleCheckout}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-rose hover:bg-rose/90 disabled:opacity-60 text-white font-semibold py-4 px-6 rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed text-lg"
+              className="w-full flex items-center justify-center gap-2 bg-rose hover:bg-rose/90 text-white font-semibold py-4 px-6 rounded-xl transition-colors cursor-pointer text-lg"
             >
-              {loading ? (
-                "Redirecting to payment..."
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5" />
-                  Pay $4.99
-                </>
-              )}
+              <CreditCard className="w-5 h-5" />
+              Pay $4.99
             </button>
 
             {/* Trust signals */}
