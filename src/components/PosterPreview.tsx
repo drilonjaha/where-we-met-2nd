@@ -30,8 +30,8 @@ export default function PosterPreview() {
   };
 
   return (
-    <div className="poster-overlay absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 via-black/40 to-transparent">
-      <div className="text-center text-white space-y-1">
+    <div className="poster-overlay absolute bottom-0 left-0 right-0 flex justify-center p-6">
+      <div className="text-center text-white space-y-1 bg-black/55 backdrop-blur-sm rounded-2xl px-10 py-6">
         <h2 className="text-lg font-light tracking-[0.25em] uppercase opacity-80">
           {title}
         </h2>

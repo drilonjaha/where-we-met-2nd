@@ -5,8 +5,6 @@ import type { AppState } from "@/types";
 
 const POSTER_W = 2480;
 const POSTER_H = 3508; // A4 at 300dpi
-const MAP_H = 2876;
-const TEXT_H = POSTER_H - MAP_H; // 632px for text section
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -60,7 +58,7 @@ export async function exportPoster(state: AppState): Promise<void> {
   container.style.left = "-9999px";
   container.style.top = "-9999px";
   container.style.width = `${POSTER_W}px`;
-  container.style.height = `${MAP_H}px`;
+  container.style.height = `${POSTER_H}px`;
   document.body.appendChild(container);
 
   try {
@@ -97,12 +95,8 @@ export async function exportPoster(state: AppState): Promise<void> {
     canvas.height = POSTER_H;
     const ctx = canvas.getContext("2d")!;
 
-    // White background
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, POSTER_W, POSTER_H);
-
-    // Draw map
-    ctx.drawImage(mapCanvas, 0, 0, POSTER_W, MAP_H);
+    // Draw map full-bleed
+    ctx.drawImage(mapCanvas, 0, 0, POSTER_W, POSTER_H);
 
     // Draw heart marker on the map
     if (markerLngLat) {
@@ -110,30 +104,53 @@ export async function exportPoster(state: AppState): Promise<void> {
       drawHeart(ctx, point.x, point.y, 60);
     }
 
-    // Draw text section below map
-    const textY = MAP_H;
+    // Semi-transparent panel for text at the bottom
+    const panelW = 1400;
+    const panelH = 520;
+    const panelX = (POSTER_W - panelW) / 2;
+    const panelY = POSTER_H - panelH - 120;
+    const panelR = 40; // border radius
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(panelX + panelR, panelY);
+    ctx.lineTo(panelX + panelW - panelR, panelY);
+    ctx.quadraticCurveTo(panelX + panelW, panelY, panelX + panelW, panelY + panelR);
+    ctx.lineTo(panelX + panelW, panelY + panelH - panelR);
+    ctx.quadraticCurveTo(panelX + panelW, panelY + panelH, panelX + panelW - panelR, panelY + panelH);
+    ctx.lineTo(panelX + panelR, panelY + panelH);
+    ctx.quadraticCurveTo(panelX, panelY + panelH, panelX, panelY + panelH - panelR);
+    ctx.lineTo(panelX, panelY + panelR);
+    ctx.quadraticCurveTo(panelX, panelY, panelX + panelR, panelY);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+    ctx.fill();
+    ctx.restore();
+
+    // Text inside panel
     const centerX = POSTER_W / 2;
+    const textBase = panelY + 80;
 
     // Title
-    ctx.fillStyle = "#2b2b2b";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
     ctx.font = "300 48px Georgia, serif";
     ctx.textAlign = "center";
     ctx.letterSpacing = "12px";
-    ctx.fillText(title.toUpperCase(), centerX, textY + 80);
+    ctx.fillText(title.toUpperCase(), centerX, textBase);
     ctx.letterSpacing = "0px";
 
     // Names
     if (name1 || name2) {
       ctx.font = "600 72px Georgia, serif";
-      ctx.fillStyle = "#2b2b2b";
+      ctx.fillStyle = "#ffffff";
       const namesText = `${name1 || "___"} & ${name2 || "___"}`;
-      ctx.fillText(namesText, centerX, textY + 180);
+      ctx.fillText(namesText, centerX, textBase + 100);
     }
 
     // Decorative line
     ctx.beginPath();
-    ctx.moveTo(centerX - 100, textY + 220);
-    ctx.lineTo(centerX + 100, textY + 220);
+    ctx.moveTo(centerX - 100, textBase + 140);
+    ctx.lineTo(centerX + 100, textBase + 140);
     ctx.strokeStyle = "#e63946";
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -141,9 +158,9 @@ export async function exportPoster(state: AppState): Promise<void> {
     // Location
     if (locationLabel) {
       ctx.font = "400 36px Georgia, serif";
-      ctx.fillStyle = "#555555";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
       ctx.letterSpacing = "4px";
-      ctx.fillText(locationLabel, centerX, textY + 290);
+      ctx.fillText(locationLabel, centerX, textBase + 210);
       ctx.letterSpacing = "0px";
     }
 
@@ -156,8 +173,8 @@ export async function exportPoster(state: AppState): Promise<void> {
         year: "numeric",
       });
       ctx.font = "300 32px Georgia, serif";
-      ctx.fillStyle = "#777777";
-      ctx.fillText(formatted, centerX, textY + 350);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+      ctx.fillText(formatted, centerX, textBase + 270);
     }
 
     // Coordinates
@@ -169,14 +186,14 @@ export async function exportPoster(state: AppState): Promise<void> {
         Math.abs(markerLngLat[0]).toFixed(4) +
         (markerLngLat[0] >= 0 ? "E" : "W");
       ctx.font = "300 28px monospace";
-      ctx.fillStyle = "#999999";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
       ctx.letterSpacing = "3px";
-      ctx.fillText(`${lat}  ${lng}`, centerX, textY + 420);
+      ctx.fillText(`${lat}  ${lng}`, centerX, textBase + 340);
       ctx.letterSpacing = "0px";
     }
 
-    // Small heart at the very bottom
-    drawHeart(ctx, centerX, textY + 550, 24);
+    // Small heart at the bottom of panel
+    drawHeart(ctx, centerX, textBase + 420, 24);
 
     // Export
     const blob = await new Promise<Blob>((resolve) => {
