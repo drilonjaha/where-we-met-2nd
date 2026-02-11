@@ -8,6 +8,14 @@ import { getStyleUrl } from "@/lib/styles";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
+function hideLabels(map: mapboxgl.Map) {
+  for (const layer of map.getStyle().layers) {
+    if (layer.type === "symbol") {
+      map.setLayoutProperty(layer.id, "visibility", "none");
+    }
+  }
+}
+
 function createHeartElement(): HTMLDivElement {
   const el = document.createElement("div");
   el.className = "heart-marker heart-marker-pulse";
@@ -42,6 +50,8 @@ export default function MapCanvas() {
     });
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    map.on("style.load", () => hideLabels(map));
 
     map.on("moveend", () => {
       const c = map.getCenter();
