@@ -64,12 +64,16 @@ export async function exportPoster(state: AppState): Promise<void> {
   document.body.appendChild(container);
 
   try {
+    // Center on heart marker if placed, and zoom in closer for the poster
+    const exportCenter = markerLngLat ?? center;
+    const exportZoom = zoom + 2;
+
     // Create export map
     const exportMap = new mapboxgl.Map({
       container,
       style: getStyleUrl(selectedStyle),
-      center,
-      zoom,
+      center: exportCenter,
+      zoom: exportZoom,
       preserveDrawingBuffer: true,
       interactive: false,
       fadeDuration: 0,
