@@ -64,7 +64,7 @@ export async function exportPoster(state: AppState): Promise<void> {
   try {
     // Center on heart marker if placed, and zoom in closer for the poster
     const exportCenter = markerLngLat ?? center;
-    const exportZoom = zoom + 2;
+    const exportZoom = zoom + 4;
 
     // Create export map
     const exportMap = new mapboxgl.Map({
@@ -101,7 +101,7 @@ export async function exportPoster(state: AppState): Promise<void> {
     // Draw heart marker on the map
     if (markerLngLat) {
       const point = exportMap.project(markerLngLat as [number, number]);
-      drawHeart(ctx, point.x, point.y, 60);
+      drawHeart(ctx, point.x, point.y, 200);
     }
 
     // Semi-transparent panel for text at the bottom
