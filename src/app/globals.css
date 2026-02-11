@@ -33,17 +33,20 @@ h3 {
   display: none !important;
 }
 
-/* Heart marker */
+/* Heart marker — transforms go on the inner SVG so they don't
+   conflict with Mapbox GL's translate-based positioning */
 .heart-marker {
   cursor: grab;
+}
+.heart-marker svg {
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
   transition: transform 0.2s ease;
 }
-.heart-marker:hover {
+.heart-marker:hover svg {
   transform: scale(1.15);
 }
 
-/* Heart pulse animation */
+/* Heart pulse animation on the SVG child */
 @keyframes heart-pulse {
   0%,
   100% {
@@ -53,7 +56,7 @@ h3 {
     transform: scale(1.1);
   }
 }
-.heart-marker-pulse {
+.heart-marker-pulse svg {
   animation: heart-pulse 1.5s ease-in-out infinite;
 }
 
