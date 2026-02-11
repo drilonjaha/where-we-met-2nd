@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-playfair: var(--font-playfair);
+  --font-inter: var(--font-inter);
+  --color-rose: #e63946;
+  --color-rose-light: #f4a0a8;
+  --color-cream: #fdf8f0;
+  --color-charcoal: #2b2b2b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+/* Mapbox overrides */
+.mapboxgl-ctrl-bottom-left,
+.mapboxgl-ctrl-bottom-right {
+  display: none !important;
+}
+
+/* Heart marker */
+.heart-marker {
+  cursor: grab;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+  transition: transform 0.2s ease;
+}
+.heart-marker:hover {
+  transform: scale(1.15);
+}
+
+/* Heart pulse animation */
+@keyframes heart-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+.heart-marker-pulse {
+  animation: heart-pulse 1.5s ease-in-out infinite;
+}
+
+/* Poster overlay text */
+.poster-overlay {
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
