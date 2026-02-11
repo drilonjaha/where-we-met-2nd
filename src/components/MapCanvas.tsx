@@ -51,7 +51,10 @@ export default function MapCanvas() {
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    map.on("style.load", () => hideLabels(map));
+    // Hide labels after style is fully loaded and rendered
+    map.on("style.load", () => {
+      map.once("idle", () => hideLabels(map));
+    });
 
     map.on("moveend", () => {
       const c = map.getCenter();
