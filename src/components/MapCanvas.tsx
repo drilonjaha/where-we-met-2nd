@@ -84,7 +84,7 @@ export default function MapCanvas() {
 
     if (markerLngLat) {
       const el = createHeartElement();
-      const marker = new mapboxgl.Marker({ element: el, draggable: true })
+      const marker = new mapboxgl.Marker({ element: el, draggable: true, anchor: "center" })
         .setLngLat(markerLngLat)
         .addTo(map);
 
